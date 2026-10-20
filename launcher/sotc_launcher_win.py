@@ -85,22 +85,29 @@ def run_command():
 
 
 # ---------------------------------------------------------------------------------------------
-# Texts: Portuguese first, English for every other Windows language.
+# Texts: Portuguese first, English and Spanish for every other Windows language.
 
 LANG = 'pt'
 
 
+try:
+    from spanish_translations import ES_TRANSLATIONS
+except ImportError:
+    ES_TRANSLATIONS = {}
 def _(pt, en):
+    if LANG == 'es':
+        return ES_TRANSLATIONS.get(en, ES_TRANSLATIONS.get(pt, en))
     return pt if LANG == 'pt' else en
-
-
 def windows_language():
     try:
         primary = ctypes.windll.kernel32.GetUserDefaultUILanguage() & 0x3ff
     except (AttributeError, OSError):
         primary = 0
-    return 'pt' if primary == 0x16 else 'en'
-
+    if primary == 0x16:
+        return 'pt'
+    if primary == 0x0a:
+        return 'es'
+    return 'en'
 
 # ---------------------------------------------------------------------------------------------
 # Settings, passed to sotc.py as environment variables.
@@ -200,7 +207,7 @@ LANGUAGES = [('', ('Automático (o do jogo)', 'Automatic (the game\'s)')),
              ('4', ('Alemão', 'German')), ('5', ('Italiano', 'Italian')), ('0', ('Japonês', 'Japanese'))]
 READBACKS = [('', ('Precisas (padrão; o jogo precisa)', 'Precise (default; the game needs them)')),
              ('1', ('Relaxadas (pode travar)', 'Relaxed (may hang)'))]
-UI_LANGUAGES = [('', ('Automático', 'Automatic')), ('pt', ('Português', 'Portuguese')), ('en', ('Inglês', 'English'))]
+UI_LANGUAGES = [('', ('Automático', 'Automatic')), ('es', ('Español', 'Spanish')), ('pt', ('Português', 'Portuguese')), ('en', ('Inglês', 'English'))]
 CONTROLS = [('W A S D', ('analógico esquerdo', 'left stick')), (('setas', 'arrows'), ('analógico direito (câmera)', 'right stick (camera)')),
             ('Espaço / Space', '✕'), ('Shift', '○'), ('E', '□'), ('Q', '△'), ('1 / 3', 'L1 / R1'), ('R / F', 'L2 / R2'),
             ('Z / C', 'L3 / R3'), ('Enter', 'Options'), ('I J K L', ('direcional', 'd-pad')),
